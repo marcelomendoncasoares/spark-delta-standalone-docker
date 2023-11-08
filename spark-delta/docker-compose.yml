@@ -1,0 +1,60 @@
+version: "3.8"
+services:
+  master:
+    image: marcelomendoncasoares/spark-delta:latest
+    ports:
+      - 7077:7077
+      - 8080:8080
+    environment:
+      SPARK_LOCAL_DIRS: /root/data
+      # SPARK_DRIVER_CORES:
+      # SPARK_DRIVER_MEMORY:
+    volumes:
+      - spark_storage:/root/data
+    command:
+      [
+        "spark-class",
+        "org.apache.spark.deploy.master.Master", "--host", "master"
+      ]
+
+  worker:
+    image: marcelomendoncasoares/spark-delta:latest
+    ports:
+      - 8081:8081
+    environment:
+      SPARK_LOCAL_DIRS: /root/data
+      # SPARK_WORKER_CORES:
+      # SPARK_WORKER_MEMORY:
+      # SPARK_EXECUTOR_INSTANCES:
+      # SPARK_EXECUTOR_CORES:
+      # SPARK_EXECUTOR_MEMORY:
+    volumes:
+      - spark_storage:/root/data
+    command:
+      [
+        "spark-class",
+        "org.apache.spark.deploy.worker.Worker", "spark://master:7077"
+      ]
+
+  # Example of an application that uses the Spark cluster. Can be replaced by
+  # a real application. Spark master will be available at spark://master:7077,
+  # where "master" is the name of the master container. After running the
+  # docker-compose up command, check the Spark UI at http://localhost:8080.
+  client:
+    image: marcelomendoncasoares/spark-delta:latest
+    environment:
+      SPARK_LOCAL_DIRS: /root/data
+    volumes:
+      - spark_storage:/root/data
+    command: [
+      "spark-submit",
+      "--master", "spark://master:7077",
+      "--class", "org.apache.spark.examples.SparkPi",
+      "/opt/spark/examples/jars/spark-examples_2.12-*.jar"
+    ]
+    depends_on:
+      - master
+      - worker
+
+volumes:
+  spark_storage:

@@ -1,0 +1,15 @@
+# Environments
+.env
+.venv
+.vscode/
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+_local_test*
+*.pkl
+*.bak
+
+# MacOS Finder metadata
+.DS_store

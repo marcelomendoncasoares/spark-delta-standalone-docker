@@ -3,6 +3,9 @@
   <a href="https://github.com/marcelomendoncasoares/spark-delta-standalone-docker">
     <img alt="GitHub" src="https://img.shields.io/badge/GitHub-marcelomendoncasoares-181717.svg?style=flat&logo=github" />
   </a>
+  <a href="https://github.com/marcelomendoncasoares/spark-delta-standalone-docker/actions/workflows/build_and_publish.yml">
+    <img alt="build" src="https://github.com/marcelomendoncasoares/spark-delta-standalone-docker/actions/workflows/build_and_publish.yml/badge.svg?branch=main" />
+  </a>
   <a href="https://hub.docker.com/r/marcelomendoncasoares/spark-delta-standalone/">
     <img alt="Docker Pulls" src="https://img.shields.io/docker/pulls/marcelomendoncasoares/spark-delta-standalone.svg" />
   </a>

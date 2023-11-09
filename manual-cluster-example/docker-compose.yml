@@ -1,14 +1,20 @@
+# Example of how to set up a standalone cluster using the provided image, but
+# launching the master and worker separately on different containers. Although
+# the expected result is to be the same when both containers run locally, it
+# presents a useful example when running multiple workers on different hosts
+# to make a real multi-node cluster.
+
 version: "3.8"
 services:
   master:
-    image: marcelomendoncasoares/spark-delta:latest
+    image: marcelomendoncasoares/spark-delta-standalone:latest
     ports:
       - 7077:7077
       - 8080:8080
-    environment:
-      SPARK_LOCAL_DIRS: /root/data
-      # SPARK_DRIVER_CORES:
-      # SPARK_DRIVER_MEMORY:
+    # environment:
+    #   SPARK_DRIVER_CORES: 1
+    #   SPARK_DRIVER_MEMORY: 1G
+    #   EXTRA_CLOUD_JARS: true
     volumes:
       - spark_storage:/root/data
     command:
@@ -18,16 +24,16 @@ services:
       ]
 
   worker:
-    image: marcelomendoncasoares/spark-delta:latest
+    image: marcelomendoncasoares/spark-delta-standalone:latest
     ports:
       - 8081:8081
-    environment:
-      SPARK_LOCAL_DIRS: /root/data
-      # SPARK_WORKER_CORES:
-      # SPARK_WORKER_MEMORY:
-      # SPARK_EXECUTOR_INSTANCES:
-      # SPARK_EXECUTOR_CORES:
-      # SPARK_EXECUTOR_MEMORY:
+    # environment:
+    #   SPARK_WORKER_CORES:
+    #   SPARK_WORKER_MEMORY:
+    #   SPARK_EXECUTOR_INSTANCES:
+    #   SPARK_EXECUTOR_CORES:
+    #   SPARK_EXECUTOR_MEMORY:
+    #   EXTRA_CLOUD_JARS: true
     volumes:
       - spark_storage:/root/data
     command:
@@ -41,16 +47,16 @@ services:
   # where "master" is the name of the master container. After running the
   # docker-compose up command, check the Spark UI at http://localhost:8080.
   client:
-    image: marcelomendoncasoares/spark-delta:latest
-    environment:
-      SPARK_LOCAL_DIRS: /root/data
+    image: marcelomendoncasoares/spark-delta-standalone:latest
+    # environment:
+    #   EXTRA_CLOUD_JARS: true
     volumes:
       - spark_storage:/root/data
     command: [
       "spark-submit",
       "--master", "spark://master:7077",
       "--class", "org.apache.spark.examples.SparkPi",
-      "/opt/spark/examples/jars/spark-examples_2.12-*.jar"
+      "/opt/spark/examples/jars/spark-examples_2.12.jar"
     ]
     depends_on:
       - master

@@ -65,6 +65,10 @@ from pathlib import Path
 from typing import Literal, TypedDict
 
 
+SPARK_CONF_PATH = Path(os.environ['SPARK_HOME']) / "conf" / "spark-defaults.conf"
+"""Spark configuration file path."""
+
+
 @lru_cache()
 def total_mem_gb() -> float:
     """
@@ -225,8 +229,6 @@ class ClusterConfig:
         Idempotently apply the cluster specifications to the conf file.
         """
 
-        conf_path = Path(os.environ['SPARK_HOME']) / "conf" / "spark-defaults.conf"
-
         # Calculated configs plus the default auto scale configs, if set.
         spark_conf = self.calculate()
         if self.auto_scale:
@@ -240,7 +242,7 @@ class ClusterConfig:
                 "dynamicAllocation.executorIdleTimeout": "180s",
             }
 
-        conf_lines = conf_path.read_text().splitlines()
+        conf_lines = SPARK_CONF_PATH.read_text().splitlines()
         for conf, value in spark_conf.items():
             conf = f"spark.{conf.replace('_', '.')}"
             for i, line in enumerate(conf_lines):
@@ -250,7 +252,7 @@ class ClusterConfig:
             if not line.startswith(conf):
                 conf_lines.append(f"{conf} {value}")
 
-        conf_path.write_text("\n".join(conf_lines))
+        SPARK_CONF_PATH.write_text("\n".join(conf_lines))
 
     def start(self) -> None:
         """
@@ -287,5 +289,24 @@ class ClusterConfig:
 
 
 if __name__ == "__main__":
-    cluster_config = ClusterConfig.from_env_vars()
-    cluster_config.start()
+    start_spark_cluster = os.environ.get("START_SPARK_CLUSTER", "").lower() == "true"
+    extra_cloud_jars_flag = os.environ.get("EXTRA_CLOUD_JARS", "false").lower()
+
+    # Add the delta package and extra cloud jars to the config file. Extra jars
+    # provided through the `EXTRA_JARS_PACKAGES` env var will also be added.
+    spark_jars = os.environ["DELTA_JAR_PACKAGE"]
+    if extra_cloud_jars_flag != "false":
+        spark_jars += "," + os.environ["EXTRA_BASE_JARS_PACKAGES"]
+        if extra_cloud_jars_flag in ("azure", "true"):
+            spark_jars += "," + os.environ["EXTRA_AZURE_JARS_PACKAGES"]
+        if extra_cloud_jars_flag in ("aws", "true"):
+            spark_jars += "," + os.environ["EXTRA_AWS_JARS_PACKAGES"]
+    if dynamic_extra_jars := os.environ.get("EXTRA_JARS_PACKAGES"):
+        spark_jars += "," + dynamic_extra_jars.replace(" ", "").strip(",")
+    with SPARK_CONF_PATH.open("a") as conf_file:
+        conf_file.write(f"spark.jars.packages {spark_jars}\n")
+
+    # Start the cluster if configured.
+    if start_spark_cluster:
+        cluster_config = ClusterConfig.from_env_vars()
+        cluster_config.start()

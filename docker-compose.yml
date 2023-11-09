@@ -5,42 +5,41 @@ services:
     ports:
       - 7077:7077
       - 8080:8080
-    # Apart from "SPARK_LOCAL_DIRS", the other variables are specific to the
-    # spark-delta-standalone cluster configuration. See the README for more
-    # information about each one.
+    # All below environment variables are specific to the standalone cluster
+    # configuration. See the README for more information about each one.
     environment:
-      SPARK_LOCAL_DIRS: /root/data
+      START_SPARK_CLUSTER: true
+      # EXTRA_CLOUD_JARS: true
+      # EXTRA_JARS_PACKAGES:
       # FREE_CORES: 1
       # DRIVER_CORES: 1
       # MIN_EXECUTOR_CORES: 1
       # FREE_MEMORY: 10%, 1GB
       # DRIVER_MEMORY: 10%, 1GB
-      # EXECUTOR_MEMORY: 0.4GB
+      # EXECUTOR_MEMORY: 4GB
       # NUM_EXECUTORS: 0
       # AUTO_SCALE: false
     volumes:
       - spark_storage:/root/data
-    command:
-      ["tail", "-f", "/dev/null"]
+    tty: true
 
   # Example of an application that uses the Spark cluster. Can be replaced by
   # a real application. Spark master will be available at spark://cluster:7077,
   # where "cluster" is the name of the cluster container. After running the
   # docker-compose up command, check the Spark UI at http://localhost:8080.
   client:
-    # DO NOT USE the same image as the cluster, because it will try to start
-    # a second cluster unnecessarily. Here we run the test with the base
-    # spark-delta image.
-    image: marcelomendoncasoares/spark-delta:latest
-    environment:
-      SPARK_LOCAL_DIRS: /root/data
+    image: marcelomendoncasoares/spark-delta-standalone:latest
+    # DO NOT set the `START_SPARK_CLUSTER` environment variable for other
+    # images, because it will try to start a second cluster unnecessarily.
+    # environment:
+    #   EXTRA_CLOUD_JARS: true
     volumes:
       - spark_storage:/root/data
     command: [
       "spark-submit",
       "--master", "spark://cluster:7077",
       "--class", "org.apache.spark.examples.SparkPi",
-      "/opt/spark/examples/jars/spark-examples_2.12-*.jar"
+      "/opt/spark/examples/jars/spark-examples_2.12.jar"
     ]
     depends_on:
       - cluster

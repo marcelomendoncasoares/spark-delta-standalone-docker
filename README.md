@@ -1,5 +1,6 @@
-<h1> Spark + Delta Standalone Docker</h1>
-<p>
+<p align="center"><img alt="logo" src="images/repo-icon.png" width="300"></p>
+<h1 align="center"> Spark + Delta Standalone Docker</h1>
+<p align="center">
   <a href="https://github.com/marcelomendoncasoares/spark-delta-standalone-docker">
     <img alt="GitHub" src="https://img.shields.io/badge/GitHub-marcelomendoncasoares-181717.svg?style=flat&logo=github" />
   </a>
@@ -7,7 +8,7 @@
     <img alt="build" src="https://github.com/marcelomendoncasoares/spark-delta-standalone-docker/actions/workflows/build_and_publish.yml/badge.svg?branch=main" />
   </a>
   <a href="https://hub.docker.com/r/marcelomendoncasoares/spark-delta-standalone/">
-    <img alt="Docker Pulls" src="https://img.shields.io/docker/pulls/marcelomendoncasoares/spark-delta-standalone.svg" />
+    <img alt="Docker Pulls" src="https://img.shields.io/docker/pulls/marcelomendoncasoares/spark-delta-standalone" />
   </a>
   <a href="http://www.apache.org/licenses/LICENSE-2.0.html">
     <img alt="License: Apache 2.0" src="https://img.shields.io/badge/license-Apache 2.0-blue.svg" target="_blank" />

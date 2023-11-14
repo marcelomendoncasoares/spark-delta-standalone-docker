@@ -18,13 +18,12 @@ jobs:
     strategy:
       matrix:
         spark-version:
-          - "3.0.3"
-          - "3.1.3"
-          - "3.2.4"
-          - "3.3.3"
-          - "3.4.1"
-          - "3.5.0"
-          - "latest"
+          - {v: "3.1.3", arg: "v3.1.3"}
+          - {v: "3.2.4", arg: "v3.2.4"}
+          - {v: "3.3.3", arg: "3.3.3"}
+          - {v: "3.4.1", arg: "3.4.1"}
+          - {v: "3.5.0", arg: "3.5.0"}
+          - {v: "latest", arg: "latest"}
 
     steps:
       - name: Set up QEMU
@@ -45,5 +44,5 @@ jobs:
           IMAGE_NAME: spark-delta-standalone
         with:
           push: true
-          tags: ${{ env.NAMESPACE }}/${{ env.IMAGE_NAME }}:${{ matrix.spark-version }}
-          build-args: SPARK_VERSION=${{ matrix.spark-version }}
+          tags: ${{ env.NAMESPACE }}/${{ env.IMAGE_NAME }}:${{ matrix.spark-version.v }}
+          build-args: SPARK_VERSION=${{ matrix.spark-version.arg }}

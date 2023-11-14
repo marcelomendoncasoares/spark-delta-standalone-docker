@@ -6,6 +6,7 @@ on:
       - "main"
     paths:
       - "Dockerfile"
+      - ".github/workflows/build_and_publish.yml"
 
 env:
   NAMESPACE: ${{ secrets.DOCKERHUB_USERNAME }}
@@ -45,3 +46,4 @@ jobs:
         with:
           push: true
           tags: ${{ env.NAMESPACE }}/${{ env.IMAGE_NAME }}:${{ matrix.spark-version }}
+          build-args: SPARK_VERSION=${{ matrix.spark-version }}

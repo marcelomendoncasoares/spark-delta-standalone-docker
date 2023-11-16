@@ -5,8 +5,10 @@ on:
     branches:
       - "main"
     paths:
-      - "Dockerfile"
       - ".github/workflows/build_and_publish.yml"
+      - "scripts/**"
+      - "spark_conf/**"
+      - "Dockerfile"
 
 env:
   NAMESPACE: ${{ secrets.DOCKERHUB_USERNAME }}

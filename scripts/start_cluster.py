@@ -83,8 +83,14 @@ def total_mem_gb() -> float:
     echo_vmstat_cmd = "echo $(vmstat -s | grep -i 'total memory' | grep -Eo [0-9]+)"
     host_mem_gb = _get_mem_from_cmd(echo_vmstat_cmd, 1024 ** 2)
 
-    container_mem_cmd = "echo $(cat /sys/fs/cgroup/memory/memory.limit_in_bytes)"
-    container_mem_gb = _get_mem_from_cmd(container_mem_cmd, 1024 ** 3)
+    try:
+        container_mem_cmd = "echo $(cat /sys/fs/cgroup/memory/memory.limit_in_bytes)"
+        container_mem_gb = _get_mem_from_cmd(container_mem_cmd, 1024 ** 3)
+
+    # The container memory limit file does not always exist. In these cases,
+    # the container memory is the same as the host memory.
+    except:
+        container_mem_gb = host_mem_gb
 
     return min(host_mem_gb, container_mem_gb)
 

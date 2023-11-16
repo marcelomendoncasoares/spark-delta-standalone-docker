@@ -223,10 +223,10 @@ class ClusterConfig:
         return ClusterSpec(
             driver_cores=self.driver_cores,
             driver_memory=f"{round(self.driver_mem.as_gb(), 1)}G",
-            worker_cores=remaining_cores,
+            worker_cores=max(remaining_cores, executor_cores),
             worker_memory=f"{round(remaining_mem, 1)}G",
             executor_instances=num_executors,
-            executor_cores=int(executor_cores),
+            executor_cores=executor_cores,
             executor_memory=f"{round(executor_mem, 1)}G",
         )
 
